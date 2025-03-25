@@ -1,0 +1,25 @@
+from base import Command
+
+from objects import LoginCredentials
+from objects import ONU
+
+class Login(Command):
+    def __init__(self, username='', password=''):
+        super().__init__("LOGIN")
+        data = LoginCredentials(username, password)
+        self.payload = data._parsed()
+        
+class Logout(Command):
+    def __init__(self):
+        super().__init__("LOGOUT")
+        
+        
+class ListShelf(Command):
+    def __init__(self):
+        super().__init__("LST","SHELF")
+        
+class DeleteONU(Command):
+    def __init__(self, onu:ONU):
+        super().__init__('DEL', 'ONU')
+        self.staging.aid = onu._get_data('olt_id', 'pon_id')
+        self.payload = onu._get_data('onu_id_type', 'id')
