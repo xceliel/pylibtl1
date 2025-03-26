@@ -1,18 +1,10 @@
 from typing import Optional
 
-from datetime import (
-    datetime as Datetime,
-    date as Date,
-    time as Time
-)
 
 from base import DataBlock
 from base import Parameter
 
-from constants import (
-    CompletionCode,
-    Terminator
-)
+
 
 from tl1types import (
     Boolean,
@@ -20,35 +12,12 @@ from tl1types import (
     String
 )
 
-class ResponseHeader:
-    __slots__ = ('sid', 'date', 'time')
 
-    def __init__(self):
-        self.source_id:str = ''
-        self.date:Date = None
-        self.time:Time = None
-
-class ResponseId:
-    __slots__ = ('atag', 'ctag', 'completion_code')
-
-    def __init__(self):
-        self.response:str = 'M'
-        self.ctag:str = 'CTAG'
-        self.completion_code:CompletionCode = CompletionCode.NONE
-
-class OutputMessage:
-    __slots__ = ('header', 'identifier', 'text', 'terminator')
-
-    def __init__(self):
-        self.header:ResponseHeader = None
-        self.identifier:ResponseId = None
-        self.text:str = ''
-        self.terminator:Terminator = Terminator.STOP
 
 class LoginCredentials(DataBlock):
     __slots__ = ('username', 'password')
     
-    def __init__(self, username='', password=''):
+    def __init__(self, username:str='', password:str=''):
         self.username = Parameter('UN', username)
         self.password = Parameter('PWD', password)
 

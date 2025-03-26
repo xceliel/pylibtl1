@@ -1,13 +1,21 @@
 from enum import Enum
 
-class CompletionCode(Enum):
-    COMPLD = 'Completed'
-    DELAY = 'Delayed'
-    DENY = 'Failed'
-    PRTL = 'Partially'
-    RTRV = 'Retrived'
-    NONE = 'None'
+class StatusCode(Enum):
+    Completed = b'COMPLD'
+    Delayed = b'DELAY'
+    Denied = b'DENY'
+    Partially = b'PRTL'
+    Retrieved = b'RTRV'
+    NONE = b'NONE'
+
+class AlarmCode(Enum):
+    Criti = b'*C'
+    Major = b'**'
+    Minor = b'*'
+    Warn = b'A'
 
 class Terminator(Enum):
-    CONTINUE = '>'
-    STOP = ';'
+    CONTINUE = b'>'
+    STOP = b';'
+    ACK = b'<'
+

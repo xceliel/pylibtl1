@@ -1,7 +1,7 @@
 from base import Command
 
-from objects import LoginCredentials
-from objects import ONU
+from fiberhome.objects import LoginCredentials
+from fiberhome.objects import ONU
 
 class Login(Command):
     def __init__(self, username='', password=''):

@@ -161,6 +161,13 @@ class String:
 
 
 class IPv4Address(String):
+    """
+        A IPv4 abstraction to verify if the IP4 address is valid
+        
+        Attributes:
+            value (str): The IPv4 address
+        
+    """
     
     __slots__ = ('value')
     
@@ -170,6 +177,13 @@ class IPv4Address(String):
         self._validate(value)
                 
     def _validate(self, value):
+        """
+            Verify the validness of the IPv4 address
+            
+            Actually it just return the ipaddress.IPv4Address object
+            itself verify the validness
+            
+        """
         return ipaddress.IPv4Address(value)
         
     def __setattr__(self, name, value):
@@ -178,6 +192,10 @@ class IPv4Address(String):
             return super().__setattr__(name, value)
     
 class NetworkPort(Integer):
+    """
+        Its a network port abstraction,
+        Just a abstraction to verify port range
+    """
     __slots__ = ('value')
     
     def __init__(self, value = False):
