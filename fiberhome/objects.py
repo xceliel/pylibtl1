@@ -1,16 +1,17 @@
 from typing import Optional
 
 
-from base import DataBlock
-from base import Parameter
+from tl1.base import DataBlock
+from tl1.base import Parameter
 
 
 
-from tl1types import (
+from tl1.tl1types import (
     Boolean,
     Integer,
     String
 )
+
 
 
 

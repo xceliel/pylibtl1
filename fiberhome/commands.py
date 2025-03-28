@@ -1,4 +1,4 @@
-from base import Command
+from tl1.base import Command
 
 from fiberhome.objects import LoginCredentials
 from fiberhome.objects import ONU
@@ -8,16 +8,16 @@ class Login(Command):
         super().__init__("LOGIN")
         data = LoginCredentials(username, password)
         self.payload = data._parsed()
-        
+
 class Logout(Command):
     def __init__(self):
         super().__init__("LOGOUT")
-        
-        
+
+
 class ListShelf(Command):
     def __init__(self):
         super().__init__("LST","SHELF")
-        
+
 class DeleteONU(Command):
     def __init__(self, onu:ONU):
         super().__init__('DEL', 'ONU')
