@@ -9,10 +9,10 @@ from .base import AcknowledgmentMessage
 
 class TL1:
 
-    def __init__(self, host:str = None, port:int = 0, timeout:int = 5, vendor = None):
+    def __init__(self, host:str = None, port:int = 0, vendor = None,  timeout:int = 5):
         self.session = Session(host, port, timeout)
         self.connected = False
-        self.vendor = vendor
+        self.vendor = vendor()
 
         if self.session.sock is not None:
             self.connected = True

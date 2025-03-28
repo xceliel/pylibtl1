@@ -344,18 +344,102 @@ class VendorBase:
     __slots__ = ('acknowledgement', 'autonomous', 'response')
 
     def __init__(self):
-        self.acknowledgement = None
-        self.autonomous = None
-        self.response = None
+        self.acknowledgement = self.acknowledgement or None
+        self.autonomous = self.autonomous or None
+        self.response = self.response or None
 
 class VendorTL1Default(VendorBase):
-    
     acknowledgement = AcknowledgmentMessage
     autonomous = AutonomousMessage
     response = Response
 
+class ImmutableRecord:
+    """
+    A class that represents an immutable record with predefined attributes stored in __slots__.
 
-def parse_response(text:str, modifiers:dict = None, vendor:VendorBase = None):
+    This class ensures that the attributes of an object are fixed and cannot be modified after
+    creation. It uses __slots__ to restrict attribute assignment, providing memory efficiency.
+    Attributes must be defined in __slots__, and any attempt to assign to an undefined attribute 
+    will raise an AttributeError.
+
+    Methods:
+        __init__(**kwargs): Initializes an instance with values for predefined attributes.
+        __iter__(): Iterates over the object's attributes, returning a (key, value) pair for each.
+        __getitem__(key): Allows item-based access to the object's attributes (like a dictionary).
+
+    Example:
+        >>> record = ImmutableRecord(name="Alice", age=30)
+        >>> print(record['name'])
+        Alice
+        >>> for key, value in record:
+        >>>     print(key, value)
+        name Alice
+        age 30
+
+    Attributes:
+        Defined dynamically through __slots__.
+    """
+    __slots__ = ()
+
+    def __init__(self, **kwargs):
+        """
+        Initializes an ImmutableRecord instance with values for the attributes defined in __slots__.
+
+        Args:
+            **kwargs: Keyword arguments representing the attributes and their corresponding values.
+        
+        Raises:
+            AttributeError: If an attempt is made to set an attribute that is not in __slots__.
+
+        Example:
+            >>> record = ImmutableRecord(name="Alice", age=30)
+            >>> print(record.name)  # Output: Alice
+        """
+        for key,value in kwargs.items():
+            if key in self.__slots__:            
+                setattr(self, key, value)
+            else:
+                raise AttributeError(f"Invalid attribute: {key}")
+
+
+    def __iter__(self):
+        """
+        Iterates over the object's attributes and returns a (key, value) pair for each.
+
+        Yields:
+            tuple: A (key, value) pair for each attribute defined in __slots__.
+        
+        Example:
+            >>> record = ImmutableRecord(name="Alice", age=30)
+            >>> for key, value in record:
+            >>>     print(key, value)
+            name Alice
+            age 30
+        """
+        return ( (key,getattr(self,key)) for key in self.__slots__ )
+
+    def __getitem__(self, key):
+        """
+        Allows item-based access to the object's attributes, like a dictionary.
+
+        Args:
+            key (str): The name of the attribute to access.
+
+        Returns:
+            The value of the specified attribute.
+
+        Raises:
+            AttributeError: If the attribute does not exist in __slots__.
+
+        Example:
+            >>> record = ImmutableRecord(name="Alice", age=30)
+            >>> print(record['name'])
+            Alice
+        """
+
+        return getattr(self,key)
+
+def parse_response(text:str, modifiers:dict = None, vendor:VendorBase = VendorTL1Default()):
     """
         Parse the TL1 response string into response object
     Args:
@@ -374,7 +458,7 @@ def parse_response(text:str, modifiers:dict = None, vendor:VendorBase = None):
         code, ctag = text[6:].split(' ',1)
         terminator = text[-1]
         ctag = ctag[:-1]
-        return AcknowledgmentMessage(code, ctag, Terminator(terminator), **modifiers)
+        return vendor.acknowledgement(code, ctag, Terminator(terminator), **modifiers)
 
 
     # Remove the firsts 6 characters, they are '\r\n\n' and the spaces
@@ -395,7 +479,7 @@ def parse_response(text:str, modifiers:dict = None, vendor:VendorBase = None):
     text = text[:-1]
 
     if identifier_txt[0] != 'M':
-        return AutonomousMessage(header, identifier, text, Terminator(terminator), **modifiers)
+        return vendor.autonomous(header, identifier, text, Terminator(terminator), **modifiers)
 
-    return Response(header, identifier, text, Terminator(terminator), **modifiers)
+    return vendor.response(header, identifier, text, Terminator(terminator), **modifiers)
 

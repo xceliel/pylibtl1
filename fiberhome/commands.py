@@ -2,19 +2,26 @@ from tl1.base import Command
 
 from fiberhome.objects import LoginCredentials
 from fiberhome.objects import ONU
+from fiberhome.constants import ResponseType
+
+class Lister(Command):
+    __slots__ = ('modifiers')
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.modifiers = {"res_type":ResponseType.LIST}
 
 class Login(Command):
     def __init__(self, username='', password=''):
         super().__init__("LOGIN")
         data = LoginCredentials(username, password)
-        self.payload = data._parsed()
+        self.payload = data
 
 class Logout(Command):
     def __init__(self):
         super().__init__("LOGOUT")
 
 
-class ListShelf(Command):
+class ListShelf(Lister):
     def __init__(self):
         super().__init__("LST","SHELF")
 
