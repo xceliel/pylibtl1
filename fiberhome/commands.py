@@ -558,12 +558,14 @@ class ConfigWifiService(BaseONUCommand):
             raise AttributeError('The Wifi bandwidth frequency need to a WifiBandwidth value')
         
         tmp['frequency_bandwidth'] = Parameter('FREQUENCYBANDWIDTH', Integer(frequency.value))
-        
-
-#        'wireless_standard': Parameter('WILESSSTANDARD', String(standard)),
 
 
-        
+        if not isinstance(standard, WifiStandard):
+            raise AttributeError('The Wifi standard should be a WifiStandard value')
+
+        tmp['wireless_standard'] = Parameter('WILESSSTANDARD', String(standard)),
+
+
         self.body = {
             **self.body,
             **tmp
@@ -572,7 +574,13 @@ class ConfigWifiService(BaseONUCommand):
         return self
         
 
-    def set_ssid(self, ssid:int = 1, name:str = '' , enabled:bool = True, visible:bool = True):
+    def set_ssid(
+        self,
+        ssid:int = 1, 
+        name:str = '' , 
+        enabled:bool = True, 
+        visible:bool = True
+        ):
         """
         Configure SSID 
 
@@ -594,15 +602,23 @@ class ConfigWifiService(BaseONUCommand):
         tmp['ssid'] = Parameter('SSID', Integer(ssid))
         
         if not isinstance(name, str) or not name.isascii():
-            raise AttributeError('The ')
+            raise AttributeError('The name should be a ascii string')
             
+        tmp['ssid_name'] = Parameter('SSIDNAME', String(name))
+
+        if not isinstance(enabled, bool):
+            raise AttributeError('The enabled attribute should be a bool value')
+            
+        tmp['ssid_enabled'] = Parameter('SSIDENABLE', Boolean(enabled))
+        
+        if not isinstance(visible, bool):
+            raise AttributeError('The visible attribute should be a bool value')
+
+        tmp['ssid_visible'] = Parameter('SSIDVISIBALE', Boolean(visible))
         
         self.body = {
             **self.body,
-            'ssid': Parameter('SSID', Integer(ssid)),
-            'ssid_enabled': Parameter('SSIDENABLE', Boolean(enabled)),
-            'ssid_name': Parameter('SSIDNAME', String(name)),
-            'ssid_visible': Parameter('SSIDVISIBALE', Boolean(visible))
+            **tmp
         }
         
         return self
@@ -669,7 +685,14 @@ class ConfigWifiService(BaseONUCommand):
         
         return self
     
-    def set_wepkey(self, index, key1, key2, key3, key4):
+    def set_wepkey(
+        self, 
+        index:int, 
+        key1:str = '', 
+        key2:str = '', 
+        key3:str = '', 
+        key4:str = ''
+        ):
         """
         Configure WEP Keys parameters
 
@@ -682,6 +705,13 @@ class ConfigWifiService(BaseONUCommand):
         Returns:
             object: ConfigWifiService instance
         """
+        
+        if not isinstance(index, int) or index < 0 and index > 4:
+            raise AttributeError('The wepkey index should be a number between 1 and 4')
+        
+        if not (isinstance(key1, str) or isinstance(key2, str) or isinstance(key3, str) or isinstance(key4, str)):
+            raise AttributeError('The key should be a string')
+        
         self.body = {
             **self.body,
             'wep_key_index': Parameter('WEPKEYINDEX', Integer(index)),
@@ -704,11 +734,26 @@ class ConfigWifiService(BaseONUCommand):
         Returns:
             object: ConfigWifiService instance
         """
+        
+        tmp = {}
+        
+        
+        
+        tmp['radius_server'] = Parameter('RADIUSSERVER', String(server))
+        
+        if port < 1 and port > 65536:
+            raise AttributeError('Wifi radius port should be between 1 and 65536')
+        
+        tmp['radius_port'] = Parameter('RADIUSPORT', Integer(port))
+        
+        
+        tmp['radius_key'] = Parameter('RADIUSKEY', String(key))
+        
+        
+        
         self.body = {
             **self.body,
-            'radius_server': {'name': 'RADIUSSERVER', 'type': String},
-            'radius_port': {'name': 'RADIUSPORT', 'type': String},
-            'radius_key': {'name': 'RADIUSKEY', 'type': String},
+            **tmp
         }
         return self    
 
