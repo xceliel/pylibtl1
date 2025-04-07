@@ -3,7 +3,7 @@ Imports the Optional type hint from the typing module.
 
 `Optional` is used to indicate that a value can either be of a specific type or None.
 """
-from typing import Optional
+from typing import Optional,  Dict, Any, Union
 
 from datetime import (
     datetime as Datetime,
@@ -53,7 +53,44 @@ class Parameter:
         """
         return self.key,str(self.value)
 
+class ParamBlock(DataBlock):
+    """
+    A subclass of `DataBlock` that dynamically creates `__slots__` based on
+    the keyword arguments provided during initialization.
+    """
+    def __new__(cls, *args, **kwargs):
+        """
+        Dynamically define `__slots__` based on the keyword arguments passed.
 
+        Args:
+            *args: Positional arguments (not used).
+            **kwargs: Keyword arguments used to dynamically define slots.
+
+        Returns:
+            ParamBlock instance with dynamically created slots.
+        """
+        instance = super().__new__(cls)
+
+        slots = kwargs.keys()
+
+        if not hasattr(instance, '__slots__'):
+            instance.__slots__ = tuple(slots)
+        else:
+            instance.__slots__ = tuple(set(slots) | set(instance.__slots__) )
+
+        return instance
+
+    def __init__(self, **kwargs):
+        """
+        Initialize the instance by assigning values from kwargs to the dynamically
+        created slots.
+
+        Args:
+            **kwargs: Keyword arguments where keys are slot names and values are slot values.
+        """
+        for item in self.__slots__:
+            setattr(self, item, kwargs[item])
+            
 class SlotsValues:
     """
     A base class for managing attribute values with predefined slots.
@@ -161,7 +198,8 @@ class PayloadBlock(DataBlock):
     pass
 
 
-
+# from TOP 10 worst ideas I had:
+# 1 - \/
 class Command:
     """
     Abstraction for a TL1 Protocol command.
@@ -175,16 +213,16 @@ class Command:
 
     def __init__(self, verb, mod1='', mod2=''):
         self.command = CommandCode(verb, mod1, mod2)
-        self.staging = StagingBlock()
-        self.payload = PayloadBlock()
+        self.staging:StagingBlock = StagingBlock()
+        self.payload:PayloadBlock = PayloadBlock()
         self.modifiers = None
-
+        
+        
     def __str__(self)  -> str:
         return f"{self.command}:{self.staging}:{self.payload};"
 
     def __bytes__(self) -> bytes:
         return bytes(self.__str__(), encoding='ascii')
-
 
 class ResponseHeader:
     """

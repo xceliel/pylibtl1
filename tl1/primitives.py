@@ -76,3 +76,4 @@ class DataBlock:
                 getattr(self, item).tuple()
                 for item in self.__slots__
             )
+
